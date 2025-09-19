@@ -61,4 +61,4 @@ jobs:
         git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git
         git add proxy.txt
         git commit -m "更新代理列表" || echo "没有更改"
-        git push --force origin main
+        git push origin +main:main
