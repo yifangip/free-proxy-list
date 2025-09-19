@@ -1,56 +1,69 @@
 name: 更新代理列表
 
 permissions:
-  contents: write
+  contents: write  # 允许 Actions 推送代码
 
 on:
   schedule:
     - cron: '0 23 * * *'  # 北京时间早上7点 (UTC 23:00)
     - cron: '0 11 * * *'  # 北京时间晚上7点 (UTC 11:00)
-  workflow_dispatch:
+  workflow_dispatch:      # 允许手动触发
 
 jobs:
   update-proxies:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. 检出代码
     - name: 检出代码
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0   # 保留完整历史
+        fetch-depth: 0  # 获取完整历史，避免 push 被拒
 
+    # 2. 设置 Git 用户信息
     - name: 设置 Git
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Actions"
 
+    # 3. 设置 Python
     - name: 设置 Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
+    # 4. 安装依赖
     - name: 安装依赖
       run: |
         python -m pip install --upgrade pip
         pip install requests beautifulsoup4
 
+    # 5. 抓取代理列表
     - name: 抓取代理列表
       run: python generate_proxy_list.py
 
+    # 6. 提交更新并处理冲突
     - name: 更新 proxy.txt 并推送
       run: |
-        # 拉取远程分支
-        git fetch origin main
         git checkout main
 
-        # 保留远程文件，覆盖 proxy.txt
-        git checkout origin/main -- .    # 恢复远程版本
-        git add proxy.txt                 # 保留本地生成的 proxy.txt
+        # 拉取远程最新代码
+        git fetch origin main
+
+        # 恢复远程文件（保留远程 README.md 等），但不覆盖 proxy.txt
+        git checkout origin/main -- .
+        git add proxy.txt
 
         # 检查是否有更新
         if git diff --staged --quiet; then
           echo "没有新的代理数据更新"
         else
-          git commit -m "自动更新代理列表 $(date '+%Y-%m-%d %H:%M:%S')"
-          git push origin main
+          # 统计新增和删除的代理数量
+          ADDED=$(git diff --staged proxy.txt | grep '^\+' | grep -v '^\+\+\+' | wc -l)
+          REMOVED=$(git diff --staged proxy.txt | grep '^\-' | grep -v '^\-\-\-' | wc -l)
+
+          git commit -m "自动更新代理列表 $(date '+%Y-%m-%d %H:%M:%S') | 新增: $ADDED, 删除: $REMOVED"
+
+          # 强制推送，保证 workflow 不会失败
+          git push origin main --force
         fi
