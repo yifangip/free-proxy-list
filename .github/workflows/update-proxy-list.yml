@@ -1,63 +1,57 @@
-name: 自动更新代理列表
+name: 更新代理列表
 
+# 添加权限配置
 permissions:
   contents: write
+  actions: read
+  pull-requests: write
+  issues: write
+  repository-projects: write
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # 北京时间早上7点
-    - cron: '0 11 * * *'  # 北京时间晚上7点
-  workflow_dispatch:      # 允许手动触发
+    # 每天早上7点和晚上7点更新代理列表（北京时间）
+    - cron: '0 23 * * *'  # 北京时间早上7点 (UTC 23:00)
+    - cron: '0 11 * * *'  # 北京时间晚上7点 (UTC 11:00)
+  workflow_dispatch:
+    # 允许手动触发
 
 jobs:
   update-proxies:
     runs-on: ubuntu-latest
-
+    
     steps:
-    # 1. 检出仓库
-    - name: 检出仓库
+    - name: 检出代码
       uses: actions/checkout@v3
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
-
-    # 2. 配置 Git 用户
-    - name: 配置 Git
-      run: |
-        git config --global user.email "action@github.com"
-        git config --global user.name "GitHub Actions"
-
-    # 3. 设置 Python
-    - name: 设置 Python
+      
+    - name: 设置Python环境
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-
-    # 4. 安装依赖
+        
     - name: 安装依赖
       run: |
         python -m pip install --upgrade pip
         pip install requests beautifulsoup4
-
-    # 5. 抓取代理列表
+        
     - name: 抓取代理列表
-      run: python generate_proxy_list.py
-
-    # 6. 提交更新 proxy.txt
-    - name: 提交更新
       run: |
-        set +e  # 避免 git 命令失败导致 workflow 中断
-
-        git checkout main
-        git fetch origin main
-
-        # 恢复远程文件，但保留 proxy.txt
-        git checkout origin/main -- .
+        python generate_proxy_list.py
+        
+    - name: 提交更新
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         git add proxy.txt
-
-        # 检查 proxy.txt 是否有更新
         if git diff --staged --quiet; then
           echo "没有新的代理数据更新"
         else
           git commit -m "自动更新代理列表 $(date '+%Y-%m-%d %H:%M:%S')"
-          git push origin main --force || echo "git push 出现错误，但 workflow 不会失败"
+          git push origin HEAD:main
         fi
