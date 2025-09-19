@@ -53,42 +53,9 @@ jobs:
         fi
         
     - name: 提交更新
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "配置 Git 用户信息..."
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        
-        echo "检查文件状态..."
-        git status
-        
-        echo "添加文件到暂存区..."
         git add proxy.txt
-        
-        echo "检查是否有更改..."
-        if git diff --staged --quiet; then
-          echo "没有新的代理数据更新"
-        else
-          echo "发现更改，准备提交..."
-          
-          echo "配置远程仓库URL..."
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          
-          echo "获取远程更改..."
-          git fetch origin main
-          
-          echo "合并远程更改..."
-          git rebase origin/main || {
-            echo "发生冲突，尝试自动解决..."
-            git rebase --abort
-            git reset --soft origin/main
-            git add proxy.txt
-          }
-          
-          git commit -m "自动更新代理列表 $(date '+%Y-%m-%d %H:%M:%S')" || echo "没有需要提交的更改"
-          
-          echo "推送更改..."
-          git push origin main
-          echo "推送完成"
-        fi
+        git commit -m "更新代理列表" || echo "没有更改"
+        git push --force origin main
