@@ -1,7 +1,7 @@
-name: 更新代理列表
+name: 自动更新代理列表
 
 permissions:
-  contents: write  # 允许 Actions 推送代码
+  contents: write  # 必须，否则 push 会被拒绝
 
 on:
   schedule:
@@ -14,19 +14,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. 检出代码
+    # 1. 检出仓库
     - name: 检出代码
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # 获取完整历史，避免 push 被拒
+        fetch-depth: 0  # 获取完整历史，避免 push 被拒绝
 
-    # 2. 设置 Git 用户信息
-    - name: 设置 Git
+    # 2. 配置 Git 用户
+    - name: 配置 Git
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Actions"
 
-    # 3. 设置 Python
+    # 3. 设置 Python 环境
     - name: 设置 Python
       uses: actions/setup-python@v4
       with:
@@ -38,32 +38,32 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests beautifulsoup4
 
-    # 5. 抓取代理列表
+    # 5. 运行脚本抓取代理
     - name: 抓取代理列表
       run: python generate_proxy_list.py
 
-    # 6. 提交更新并处理冲突
-    - name: 更新 proxy.txt 并推送
+    # 6. 提交并推送 proxy.txt
+    - name: 提交更新
       run: |
         git checkout main
 
-        # 拉取远程最新代码
+        # 拉取远程最新提交
         git fetch origin main
 
-        # 恢复远程文件（保留远程 README.md 等），但不覆盖 proxy.txt
+        # 恢复远程文件，保留 proxy.txt
         git checkout origin/main -- .
         git add proxy.txt
 
-        # 检查是否有更新
+        # 检查 proxy.txt 是否有更新
         if git diff --staged --quiet; then
           echo "没有新的代理数据更新"
         else
-          # 统计新增和删除的代理数量
+          # 统计新增和删除行数
           ADDED=$(git diff --staged proxy.txt | grep '^\+' | grep -v '^\+\+\+' | wc -l)
           REMOVED=$(git diff --staged proxy.txt | grep '^\-' | grep -v '^\-\-\-' | wc -l)
 
           git commit -m "自动更新代理列表 $(date '+%Y-%m-%d %H:%M:%S') | 新增: $ADDED, 删除: $REMOVED"
 
-          # 强制推送，保证 workflow 不会失败
+          # 强制推送，保证 workflow 不会因为远程已有提交失败
           git push origin main --force
         fi
