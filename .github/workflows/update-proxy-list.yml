@@ -39,19 +39,46 @@ jobs:
         
     - name: 抓取代理列表
       run: |
+        echo "开始抓取代理列表..."
         python generate_proxy_list.py
+        echo "抓取完成，检查文件是否生成..."
+        if [ -f proxy.txt ]; then
+          echo "proxy.txt 文件已生成"
+          echo "文件内容预览："
+          head -5 proxy.txt
+        else
+          echo "proxy.txt 文件未生成"
+          exit 1
+        fi
         
     - name: 提交更新
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        echo "配置 Git 用户信息..."
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        
+        echo "检查文件状态..."
+        git status
+        
+        echo "添加文件到暂存区..."
         git add proxy.txt
+        
+        echo "检查是否有更改..."
         if git diff --staged --quiet; then
           echo "没有新的代理数据更新"
         else
+          echo "发现更改，准备提交..."
           git commit -m "自动更新代理列表 $(date '+%Y-%m-%d %H:%M:%S')"
-          git push origin HEAD:main
+          
+          echo "配置远程仓库URL..."
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          
+          echo "推送更改..."
+          git push origin HEAD:main || {
+            echo "推送失败，尝试使用不同的方法..."
+            git push origin main
+          }
+          echo "推送完成"
         fi
