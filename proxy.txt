@@ -1,6 +1,11 @@
-# 代理列表更新时间: 2025-11-05 11:12:24
+# 代理列表更新时间: 2025-11-05 23:19:56
 # 总计: 30 个代理
 
+socks5://94.182.93.108:10808 [[机房] 德国 巴伐利亚 纽伦堡 — Hetzner [Hetzner Online GmbH]]
+socks5://188.242.38.56:10808 [[家宽] 芬兰 新地区 赫尔辛基 [FIRST SERVER LIMITED]]
+socks5://34.84.10.155:1080 [[机房] 韩国 首尔特别市 首尔特别市 [Korea Telecom]]
+socks5://167.71.70.78:10808 [[机房] 荷兰 北荷兰省 阿姆斯特丹 — DigitalOcean [DigitalOcean, LLC]]
+socks5://124.122.71.117:1080 [[机房] 泰国 曼谷 曼谷 [True Internet Co., Ltd.]]
 socks5://185.105.90.184:12304 [[机房] 俄罗斯 莫斯科 莫斯科 [FIRST SERVER LIMITED]]
 socks5://174.138.120.54:1080 [[机房] 印度 卡纳塔克邦 — DigitalOcean [DigitalOcean, LLC]]
 socks5://134.209.152.138:1080 [[机房] 印度 卡纳塔克邦 — DigitalOcean [DigitalOcean, LLC]]
@@ -15,7 +20,6 @@ socks5://91.103.122.182:10808 [[机房] 中国 香港 香港 [HK AliceNetwork]]
 socks5://77.51.222.97:10808 [[机房] 美国 纽约州 纽约 [HOSTKEY]]
 socks5://14.233.135.96:1080 [[机房] 越南 [Vietnam Posts and Telecommunications Group]]
 socks5://168.253.92.93:10808 [[机房] 南非 豪登省 约翰内斯堡 [CMV]]
-socks5://156.238.254.61:1080 [[机房] 美国 加州 洛杉矶 [High Family Technology Co., Limited]]
 socks5://52.76.141.200:1080 [[机房] 新加坡 新加坡 新加坡 — 亚马逊云 Aws [Amazon Technologies Inc.]]
 socks5://151.243.213.105:10808 [[机房] 美国 加州 洛杉矶 [Multacom Corporation]]
 socks5://43.230.192.88:1080 [[机房] 柬埔寨 金边 金边 [Cogetel Ltd, Online ISP, Cambodia]]
@@ -27,7 +31,3 @@ socks5://176.215.11.52:80 [[机房] 俄罗斯 斯维尔德洛夫斯克州 叶卡
 socks5://45.120.178.66:8080 [[机房] 荷兰 弗莱福兰省 莱利斯塔德 [WorkTitans B.V.]]
 socks5://185.123.53.225:30000 [[家宽] 西班牙 巴利亚里群岛 [PROPHASE ELECTRONICS S.L. - CLIENTES]]
 socks5://185.241.43.247:30000 [[机房] 中国 香港 香港 [BAGE CLOUD LLC]]
-socks5://175.182.175.106:30000 [[家宽] 中国 台湾 台北市 [New Century InfoComm Tech. Co., Ltd.]]
-socks5://185.139.228.219:9055 [[机房] 荷兰 北荷兰省 阿姆斯特丹 — DigitalOcean [DigitalOcean, LLC]]
-socks5://104.251.236.203:1234 [[机房] 中国 香港 香港 [INFINITE NETWORK LLC]]
-socks5://51.81.222.200:10808 [[家宽] 中国 香港 香港 [Hong Kong Telecommunications (HKT) Limited Mass Internet]]
